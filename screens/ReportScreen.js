@@ -63,109 +63,112 @@ const ReportScreen = () => {
     setLoading(false);
   };
 
-  const handleDownloadReport = async () => {
-    if (!reportData || reportData.length === 0) {
-      Alert.alert('No Data', 'No report data available to download.');
-      return;
-    }
+const handleDownloadReport = async () => {
+  if (!reportData || reportData.length === 0) {
+    Alert.alert('No Data', 'No report data available to download.');
+    return;
+  }
 
-    let headers;
-    let data;
+  let headers;
+  let data;
 
-    if (reportType === 'SHIFT SUMMARY REPORT') {
-      headers = ['Shift No', 'Date', 'Activity', 'Total Input (kgs)', 'Total Output (kgs)', 'Input/Output Ratio', 'Production Loss', 'Production Gain'];
-      data = reportData;
-    } else if (reportType === 'SHIFT ACTIVITY REPORT') {
-      headers = ['Shift No', 'Supplier', 'Grade', 'Total Kgs', 'Total Bags', 'Batch No', 'Cell', 'Entry Type'];
-      data = reportData.map(item => ({
-        'Shift No': item.shift.shift_no,
-        'Supplier': item.supplier,
-        'Grade': item.grade,
-        'Total Kgs': item.total_kgs,
-        'Total Bags': item.total_bags,
-        'Batch No': item.batchno_grn,
-        'Cell': item.cell,
-        'Entry Type': item.entry_type
-      }));
-    }
+  if (reportType === 'SHIFT SUMMARY REPORT') {
+    headers = ['Shift No', 'Date', 'Activity', 'Total Input (kgs)', 'Total Output (kgs)', 'Input/Output Ratio', 'Production Loss', 'Production Gain'];
+    data = reportData;
+  } else if (reportType === 'SHIFT ACTIVITY REPORT') {
+    headers = ['Shift No', 'Supplier', 'Grade', 'Total Kgs', 'Total Bags', 'Batch No', 'Cell', 'Entry Type'];
+    data = reportData.map(item => ({
+      'Shift No': item.shift.shift_no,
+      'Supplier': item.supplier,
+      'Grade': item.grade,
+      'Total Kgs': item.total_kgs,
+      'Total Bags': item.total_bags,
+      'Batch No': item.batchno_grn,
+      'Cell': item.cell,
+      'Entry Type': item.entry_type
+    }));
+  }
 
-    // Create the worksheet with the data
-    const worksheet = XLSX.utils.json_to_sheet(data, { header: headers });
+  // Create an empty worksheet first
+  const worksheet = XLSX.utils.json_to_sheet([]);
 
-    // Define the header style
-    const headerStyle = {
-      fill: {
-        fgColor: { rgb: '008080' },
-      },
-      font: {
-        color: { rgb: 'FFFFFF' },
-        bold: true,
-      },
-      alignment: {
-        vertical: 'center',
-        horizontal: 'center',
-      },
-      border: {
-        top: { style: 'thin', color: { rgb: '000000' } },
-        bottom: { style: 'thin', color: { rgb: '000000' } },
-        left: { style: 'thin', color: { rgb: '000000' } },
-        right: { style: 'thin', color: { rgb: '000000' } },
-      },
-    };
+  // Add the headers to the worksheet
+  XLSX.utils.sheet_add_aoa(worksheet, [headers], { origin: 'A1' });
 
-    // Apply the header style
-    XLSX.utils.sheet_add_aoa(worksheet, [headers], { origin: 'A1', styles: [headerStyle] });
+  // Append the data to the worksheet starting from the second row
+  XLSX.utils.sheet_add_json(worksheet, data, { origin: 'A2', skipHeader: true });
 
-    // Set the row height for the header and data rows
-    worksheet['!rows'] = Array(data.length + 1).fill({ hpx: 30 });
-
-    // Apply the data style to all rows
-    const dataStyle = {
-      alignment: {
-        vertical: 'center',
-        horizontal: 'center',
-      },
-      border: {
-        top: { style: 'thin', color: { rgb: '000000' } },
-        bottom: { style: 'thin', color: { rgb: '000000' } },
-        left: { style: 'thin', color: { rgb: '000000' } },
-        right: { style: 'thin', color: { rgb: '000000' } },
-      },
-    };
-    XLSX.utils.sheet_add_json(worksheet, data, { origin: 'A2', skipHeader: true, styles: dataStyle });
-
-    // Create a new workbook and add the worksheet
-    const workbook = XLSX.utils.book_new();
-    XLSX.utils.book_append_sheet(workbook, worksheet, "Report");
-
-    // Generate the Excel file as a buffer
-    const excelBuffer = XLSX.write(workbook, { bookType: 'xlsx', type: 'array' });
-
-    if (Platform.OS === 'web') {
-      // Web platform code
-      const blob = new Blob([excelBuffer], { type: 'application/vnd.openxmlformats-officedocument.spreadsheetml.sheet' });
-      const fileUrl = URL.createObjectURL(blob);
-      const link = document.createElement('a');
-      link.href = fileUrl;
-      link.setAttribute('download', 'ShiftReport.xlsx');
-      document.body.appendChild(link);
-      link.click();
-      link.parentNode.removeChild(link);
-    } else {
-      // Mobile platform code
-      const fileUri = `${FileSystem.documentDirectory}ShiftReport.xlsx`;
-
-      await FileSystem.writeAsStringAsync(fileUri, Buffer.from(excelBuffer).toString('base64'), {
-        encoding: FileSystem.EncodingType.Base64,
-      });
-
-      if (await Sharing.isAvailableAsync()) {
-        await Sharing.shareAsync(fileUri);
-      } else {
-        Alert.alert('Download', 'Report has been saved successfully!');
-      }
-    }
+  // Define the header style
+  const headerStyle = {
+    fill: {
+      fgColor: { rgb: '008080' },
+    },
+    font: {
+      color: { rgb: 'FFFFFF' },
+      bold: true,
+    },
+    alignment: {
+      vertical: 'center',
+      horizontal: 'center',
+    },
+    border: {
+      top: { style: 'thin', color: { rgb: '000000' } },
+      bottom: { style: 'thin', color: { rgb: '000000' } },
+      left: { style: 'thin', color: { rgb: '000000' } },
+      right: { style: 'thin', color: { rgb: '000000' } },
+    },
   };
+
+  // Set the row height for the header and data rows
+  worksheet['!rows'] = Array(data.length + 1).fill({ hpx: 30 });
+
+  // Apply the data style to all rows
+  const dataStyle = {
+    alignment: {
+      vertical: 'center',
+      horizontal: 'center',
+    },
+    border: {
+      top: { style: 'thin', color: { rgb: '000000' } },
+      bottom: { style: 'thin', color: { rgb: '000000' } },
+      left: { style: 'thin', color: { rgb: '000000' } },
+      right: { style: 'thin', color: { rgb: '000000' } },
+    },
+  };
+
+  // Create a new workbook and add the worksheet
+  const workbook = XLSX.utils.book_new();
+  XLSX.utils.book_append_sheet(workbook, worksheet, "Report");
+
+  // Generate the Excel file as a buffer
+  const excelBuffer = XLSX.write(workbook, { bookType: 'xlsx', type: 'array' });
+
+  if (Platform.OS === 'web') {
+    // Web platform code
+    const blob = new Blob([excelBuffer], { type: 'application/vnd.openxmlformats-officedocument.spreadsheetml.sheet' });
+    const fileUrl = URL.createObjectURL(blob);
+    const link = document.createElement('a');
+    link.href = fileUrl;
+    link.setAttribute('download', 'ShiftReport.xlsx');
+    document.body.appendChild(link);
+    link.click();
+    link.parentNode.removeChild(link);
+  } else {
+    // Mobile platform code
+    const fileUri = `${FileSystem.documentDirectory}ShiftReport.xlsx`;
+
+    await FileSystem.writeAsStringAsync(fileUri, Buffer.from(excelBuffer).toString('base64'), {
+      encoding: FileSystem.EncodingType.Base64,
+    });
+
+    if (await Sharing.isAvailableAsync()) {
+      await Sharing.shareAsync(fileUri);
+    } else {
+      Alert.alert('Download', 'Report has been saved successfully!');
+    }
+  }
+};
+
 
   const renderDropdown = (value, setValue, showDropDown, setShowDropDown, list, label) => {
     if (Platform.OS === 'web') {
@@ -384,8 +387,14 @@ export default ReportScreen;
 //     // Define the header names
 //     const headers = ['Shift No', 'Date', 'Activity', 'Total Input (kgs)', 'Total Output (kgs)', 'Input/Output Ratio', 'Production Loss', 'Production Gain'];
   
-//     // Create the worksheet with the data
-//     const worksheet = XLSX.utils.json_to_sheet(reportData, { header: headers });
+//     // Create an empty worksheet first
+//     const worksheet = XLSX.utils.json_to_sheet([]);
+  
+//     // Add the headers to the worksheet
+//     XLSX.utils.sheet_add_aoa(worksheet, [headers], { origin: 'A1' });
+  
+//     // Append the data to the worksheet starting from the second row
+//     XLSX.utils.sheet_add_json(worksheet, reportData, { origin: 'A2', skipHeader: true });
   
 //     // Define the header style
 //     const headerStyle = {
@@ -408,9 +417,6 @@ export default ReportScreen;
 //       },
 //     };
   
-//     // Apply the header style
-//     XLSX.utils.sheet_add_aoa(worksheet, [headers], { origin: 'A1', styles: [headerStyle] });
-  
 //     // Set the row height for the header and data rows
 //     worksheet['!rows'] = Array(reportData.length + 1).fill({ hpx: 30 });
   
@@ -427,8 +433,7 @@ export default ReportScreen;
 //         right: { style: 'thin', color: { rgb: '000000' } },
 //       },
 //     };
-//     XLSX.utils.sheet_add_json(worksheet, reportData, { origin: 'A2', skipHeader: true, styles: dataStyle });
-  
+    
 //     // Create a new workbook and add the worksheet
 //     const workbook = XLSX.utils.book_new();
 //     XLSX.utils.book_append_sheet(workbook, worksheet, "Report");
@@ -461,6 +466,7 @@ export default ReportScreen;
 //       }
 //     }
 //   };
+  
 
 //   const renderDropdown = (value, setValue, showDropDown, setShowDropDown, list, label) => {
 //     if (Platform.OS === 'web') {

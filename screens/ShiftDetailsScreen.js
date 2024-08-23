@@ -102,7 +102,7 @@ export default function ShiftDetailsScreen({ route, navigation }) {
   };
 
   const validateInputs = () => {
-    if (!supplier || !grade || !totalkgs || !totalbags || !batchnogrn || !cell) {
+    if (!grade || !totalkgs || !totalbags || !batchnogrn || !cell) {
       Alert.alert('Error', 'All fields are required');
       return false;
     }
@@ -114,7 +114,7 @@ export default function ShiftDetailsScreen({ route, navigation }) {
 
     const newEntry = {
       shift_id: shiftId, // Ensure shift_id is used
-      supplier,
+      // supplier,
       grade,
       total_kgs: totalkgs,
       total_bags: totalbags,
@@ -157,7 +157,7 @@ export default function ShiftDetailsScreen({ route, navigation }) {
         <Title>{type} Entries</Title>
         <DataTable>
           <DataTable.Header>
-            {['Supplier', 'Grade', 'Kgs', 'Bags', 'Batch No/GRN', 'Cell'].map((title, index) => (
+            {['Grade', 'Kgs', 'Bags', 'Batch No/GRN', 'Cell'].map((title, index) => (
               <DataTable.Title key={index} style={styles.cell}>
                 <Text style={styles.headerText}>{title}</Text>
               </DataTable.Title>
@@ -168,7 +168,7 @@ export default function ShiftDetailsScreen({ route, navigation }) {
             .filter(item => item.entry_type === type)
             .map((item) => (
               <DataTable.Row key={item.id}>
-                {['supplier', 'grade', 'total_kgs', 'total_bags', 'batchno_grn', 'cell'].map((field, index) => (
+                {[ 'grade', 'total_kgs', 'total_bags', 'batchno_grn', 'cell'].map((field, index) => (
                   <DataTable.Cell key={index} style={styles.cell} numeric={field === 'total_kgs' || field === 'total_bags'}>
                     {item[field]}
                   </DataTable.Cell>
@@ -190,6 +190,9 @@ export default function ShiftDetailsScreen({ route, navigation }) {
               <Paragraph>Shift No: {shiftDetails.shift_no || 'N/A'}</Paragraph>
               <Paragraph>Activity: {shiftDetails.activity || 'N/A'}</Paragraph>
               <Paragraph>Date: {shiftDetails.date || 'N/A'}</Paragraph>
+              <Paragraph>Shift Type: {shiftDetails.shift_type || 'N/A'}</Paragraph>
+              <Paragraph>Supplier: {shiftDetails.supplier || 'N/A'}</Paragraph>
+              <Paragraph>Coffee Type: {shiftDetails.coffee_type || 'N/A'}</Paragraph>
             </View>
           </Card.Content>
         </Card>
@@ -198,7 +201,7 @@ export default function ShiftDetailsScreen({ route, navigation }) {
       <Card style={styles.card}>
         <Card.Content>
           <Title>Add Entry</Title>
-          {renderDropdown(supplier, setSupplier, showSupplierDropDown, setShowSupplierDropDown, supplierList, 'Supplier')}
+          {/* {renderDropdown(supplier, setSupplier, showSupplierDropDown, setShowSupplierDropDown, supplierList, 'Supplier')} */}
           {renderDropdown(grade, setGrade, showGradeDropDown, setShowGradeDropDown, gradeList, 'Grade')}
           <TextInput
             label="Total Kgs"
