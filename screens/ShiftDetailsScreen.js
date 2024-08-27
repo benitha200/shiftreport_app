@@ -7,7 +7,6 @@ export default function ShiftDetailsScreen({ route, navigation }) {
   const [shiftDetails, setShiftDetails] = useState(null);
   const [supplier, setSupplier] = useState('');
   const [grade, setGrade] = useState('');
-  const [showSupplierDropDown, setShowSupplierDropDown] = useState(false);
   const [showGradeDropDown, setShowGradeDropDown] = useState(false);
   const [totalkgs, setTotalkgs] = useState('');
   const [totalbags, setTotalbags] = useState('');
@@ -15,17 +14,14 @@ export default function ShiftDetailsScreen({ route, navigation }) {
   const [cell, setCell] = useState('');
   const [tableData, setTableData] = useState([]);
 
-  const supplierList = ['BAHO', 'BENDER', 'BESTFARMER', 'BUTARA', 'CAGEYO'];
   const gradeList = ['F.SC.15', 'F.SC.13', 'F.CSR.15', 'F.GTR.15', 'FW.TRI', 'SC.15', 'SC.13'];
 
   useEffect(() => {
-    // Fetch shift details
     const fetchShiftDetails = async () => {
       try {
-        const response = await fetch(`http://127.0.0.1:8000/api/shifts/${shiftId}`, {
+        const response = await fetch(`http://192.168.81.57:8000/api/shifts/${shiftId}`, {
           method: 'GET',
           headers: { 'Content-Type': 'application/json' },
-          // body: JSON.stringify({ "shift_no": "001", "activity": "Processing", "date": "2024-08-19" })
         });
         const result = await response.json();
         setShiftDetails(result);
@@ -35,21 +31,20 @@ export default function ShiftDetailsScreen({ route, navigation }) {
       }
     };
   
-    // Fetch shift entries
+
     const fetchShiftEntries = async () => {
       try {
-        const response = await fetch(`http://127.0.0.1:8000/api/shiftdetail/${shiftId}/`);
+        const response = await fetch(`http://192.168.81.57:8000/api/shiftdetail/${shiftId}/`);
         if (response.ok) {
           const data = await response.json();
-          setTableData(Array.isArray(data) ? data : []); // Ensure tableData is always an array
+          setTableData(Array.isArray(data) ? data : []);
         } else {
-          // Handle case where response is not OK
-          setTableData([]); // Set empty array if no data is found
+          setTableData([]);
         }
       } catch (error) {
         console.error('Error fetching shift details:', error);
         Alert.alert('Error', 'Failed to fetch shift details.');
-        setTableData([]); // Set empty array in case of error
+        setTableData([]);
       }
     };
   
@@ -123,7 +118,7 @@ export default function ShiftDetailsScreen({ route, navigation }) {
       entry_type: type,
     };
 
-    fetch('http://127.0.0.1:8000/api/shiftdetails/', {
+    fetch('http://192.168.81.57:8000/api/shiftdetails/', {
       method: 'POST',
       headers: {
         'Content-Type': 'application/json',
@@ -151,34 +146,57 @@ export default function ShiftDetailsScreen({ route, navigation }) {
     setCell('');
   };
 
-  const renderTable = (type) => (
-    <Card style={styles.card}>
-      <Card.Content>
-        <Title>{type} Entries</Title>
-        <DataTable>
-          <DataTable.Header>
-            {['Grade', 'Kgs', 'Bags', 'Batch No/GRN', 'Cell'].map((title, index) => (
-              <DataTable.Title key={index} style={styles.cell}>
-                <Text style={styles.headerText}>{title}</Text>
-              </DataTable.Title>
-            ))}
-          </DataTable.Header>
+  const renderTable = (type) => {
+    const filteredData = Array.isArray(tableData)
+      ? tableData.filter(item => item.entry_type === type)
+      : [];
   
-          {Array.isArray(tableData) && tableData
-            .filter(item => item.entry_type === type)
-            .map((item) => (
+    const totals = filteredData.reduce((acc, item) => ({
+      total_kgs: acc.total_kgs + parseFloat(item.total_kgs || 0),
+      total_bags: acc.total_bags + parseInt(item.total_bags || 0)
+    }), { total_kgs: 0, total_bags: 0 });
+  
+    return (
+      <Card style={styles.card}>
+        <Card.Content>
+          <Title>{type} Entries</Title>
+          <DataTable>
+            <DataTable.Header style={styles.tableHeader}>
+              {['Grade', 'Kgs', 'Bags', 'Batch No/GRN', 'Cell'].map((title, index) => (
+                <DataTable.Title key={index} style={styles.cell}>
+                  <Text style={styles.headerText}>{title}</Text>
+                </DataTable.Title>
+              ))}
+            </DataTable.Header>
+            
+            {filteredData.map((item) => (
               <DataTable.Row key={item.id}>
-                {[ 'grade', 'total_kgs', 'total_bags', 'batchno_grn', 'cell'].map((field, index) => (
+                {['grade', 'total_kgs', 'total_bags', 'batchno_grn', 'cell'].map((field, index) => (
                   <DataTable.Cell key={index} style={styles.cell} numeric={field === 'total_kgs' || field === 'total_bags'}>
                     {item[field]}
                   </DataTable.Cell>
                 ))}
               </DataTable.Row>
             ))}
-        </DataTable>
-      </Card.Content>
-    </Card>
-  );
+  
+            <DataTable.Row style={styles.totalRow}>
+              <DataTable.Cell style={styles.cell}>
+                <Text style={styles.totalText}>Total</Text>
+              </DataTable.Cell>
+              <DataTable.Cell style={styles.cell} numeric>
+                <Text style={styles.totalText}>{totals.total_kgs.toFixed(0)} </Text>
+              </DataTable.Cell>
+              <DataTable.Cell style={styles.cell} numeric>
+                <Text style={styles.totalText}>{totals.total_bags} </Text>
+              </DataTable.Cell>
+              <DataTable.Cell style={styles.cell}></DataTable.Cell>
+              <DataTable.Cell style={styles.cell}></DataTable.Cell>
+            </DataTable.Row>
+          </DataTable>
+        </Card.Content>
+      </Card>
+    );
+  }
   
   return (
     <ScrollView style={styles.container}>
@@ -191,7 +209,7 @@ export default function ShiftDetailsScreen({ route, navigation }) {
               <Paragraph>Activity: {shiftDetails.activity || 'N/A'}</Paragraph>
               <Paragraph>Date: {shiftDetails.date || 'N/A'}</Paragraph>
               <Paragraph>Shift Type: {shiftDetails.shift_type || 'N/A'}</Paragraph>
-              <Paragraph>Supplier: {shiftDetails.supplier || 'N/A'}</Paragraph>
+              <Paragraph>Supplier: <Paragraph style={styles.textStyle}>{shiftDetails.supplier || 'N/A'}</Paragraph></Paragraph>
               <Paragraph>Coffee Type: {shiftDetails.coffee_type || 'N/A'}</Paragraph>
             </View>
           </Card.Content>
@@ -201,7 +219,6 @@ export default function ShiftDetailsScreen({ route, navigation }) {
       <Card style={styles.card}>
         <Card.Content>
           <Title>Add Entry</Title>
-          {/* {renderDropdown(supplier, setSupplier, showSupplierDropDown, setShowSupplierDropDown, supplierList, 'Supplier')} */}
           {renderDropdown(grade, setGrade, showGradeDropDown, setShowGradeDropDown, gradeList, 'Grade')}
           <TextInput
             label="Total Kgs"
@@ -234,7 +251,7 @@ export default function ShiftDetailsScreen({ route, navigation }) {
               Add Input
             </Button>
             <Button mode="contained" onPress={() => handleAddEntry('Output')} style={[styles.button, styles.outputButton]}>
-              Add Output
+              Add Outputs
             </Button>
             <Button mode="contained" onPress={() => handleAddEntry('Balance')} style={[styles.button, styles.balanceButton]}>
               Add Balance
@@ -273,7 +290,6 @@ const styles = StyleSheet.create({
     height: 40,
     borderColor: '#000',
     borderWidth: 1,
-    borderRadius: 4,
     paddingLeft: 8,
     paddingRight: 8,
   },
@@ -284,20 +300,23 @@ const styles = StyleSheet.create({
   buttonContainer: {
     flexDirection: 'row',
     justifyContent: 'space-between',
+    flexWrap: 'wrap',
     marginTop: 10,
   },
   button: {
-    flex: 1,
+    flexBasis:'45%',
+    margin:5,
     marginHorizontal: 5,
+    textAlign:'left',
   },
   inputButton: {
     backgroundColor: 'rgb(148 163 184)',
   },
   outputButton: {
-    backgroundColor: '#F44336',
+    backgroundColor: 'rgb(5 150 105)',
   },
   balanceButton: {
-    backgroundColor: '#2196F3',
+    backgroundColor: 'rgb(2 132 199)',
   },
   cell: {
     flex: 1,
@@ -306,5 +325,24 @@ const styles = StyleSheet.create({
   },
   headerText: {
     fontWeight: 'bold',
+  },
+  tableHeader: {
+    textAlign: 'left',
+    backgroundColor: 'rgb(226 232 240)',
+  },
+  totalText:{
+    fontWeight: 'bold',
+    color: 'rgb(255 255 255)',
+    padding:'0.02rem',
+    textAlign: 'right',
+    padding: 5,
+  },
+  totalRow:{
+    backgroundColor:'rgb(20 184 166)',
+  },
+  textStyle:{
+    fontWeight: 'bold',
+    color: 'rgb(15 118 110)',
+    padding: 5,
   },
 });

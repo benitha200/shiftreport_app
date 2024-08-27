@@ -4,6 +4,7 @@ import { Title, TextInput, Button, Menu } from 'react-native-paper';
 import * as FileSystem from 'expo-file-system';
 import * as Sharing from 'expo-sharing';
 import * as XLSX from 'xlsx';
+import { Buffer } from 'buffer';
 
 const ReportScreen = () => {
   const [startDate, setStartDate] = useState('');
@@ -39,7 +40,7 @@ const ReportScreen = () => {
       };
 
       try {
-        const response = await fetch("http://127.0.0.1:8000/api/shift-summary-report/", requestOptions);
+        const response = await fetch("http://192.168.81.57:8000/api/shift-summary-report/", requestOptions);
         const result = await response.json();
         setReportData(result);
       } catch (error) {
@@ -52,7 +53,7 @@ const ReportScreen = () => {
       };
 
       try {
-        const response = await fetch(`http://127.0.0.1:8000/api/shiftdetail/${startDate}`, requestOptions);
+        const response = await fetch(`http://192.168.81.57:8000/api/shiftdetail/${startDate}`, requestOptions);
         const result = await response.json();
         setReportData(result);
       } catch (error) {
@@ -63,111 +64,56 @@ const ReportScreen = () => {
     setLoading(false);
   };
 
-const handleDownloadReport = async () => {
-  if (!reportData || reportData.length === 0) {
-    Alert.alert('No Data', 'No report data available to download.');
-    return;
-  }
 
-  let headers;
-  let data;
 
-  if (reportType === 'SHIFT SUMMARY REPORT') {
-    headers = ['Shift No', 'Date', 'Activity', 'Total Input (kgs)', 'Total Output (kgs)', 'Input/Output Ratio', 'Production Loss', 'Production Gain'];
-    data = reportData;
-  } else if (reportType === 'SHIFT ACTIVITY REPORT') {
-    headers = ['Shift No', 'Supplier', 'Grade', 'Total Kgs', 'Total Bags', 'Batch No', 'Cell', 'Entry Type'];
-    data = reportData.map(item => ({
-      'Shift No': item.shift.shift_no,
-      'Supplier': item.supplier,
-      'Grade': item.grade,
-      'Total Kgs': item.total_kgs,
-      'Total Bags': item.total_bags,
-      'Batch No': item.batchno_grn,
-      'Cell': item.cell,
-      'Entry Type': item.entry_type
-    }));
-  }
-
-  // Create an empty worksheet first
-  const worksheet = XLSX.utils.json_to_sheet([]);
-
-  // Add the headers to the worksheet
-  XLSX.utils.sheet_add_aoa(worksheet, [headers], { origin: 'A1' });
-
-  // Append the data to the worksheet starting from the second row
-  XLSX.utils.sheet_add_json(worksheet, data, { origin: 'A2', skipHeader: true });
-
-  // Define the header style
-  const headerStyle = {
-    fill: {
-      fgColor: { rgb: '008080' },
-    },
-    font: {
-      color: { rgb: 'FFFFFF' },
-      bold: true,
-    },
-    alignment: {
-      vertical: 'center',
-      horizontal: 'center',
-    },
-    border: {
-      top: { style: 'thin', color: { rgb: '000000' } },
-      bottom: { style: 'thin', color: { rgb: '000000' } },
-      left: { style: 'thin', color: { rgb: '000000' } },
-      right: { style: 'thin', color: { rgb: '000000' } },
-    },
-  };
-
-  // Set the row height for the header and data rows
-  worksheet['!rows'] = Array(data.length + 1).fill({ hpx: 30 });
-
-  // Apply the data style to all rows
-  const dataStyle = {
-    alignment: {
-      vertical: 'center',
-      horizontal: 'center',
-    },
-    border: {
-      top: { style: 'thin', color: { rgb: '000000' } },
-      bottom: { style: 'thin', color: { rgb: '000000' } },
-      left: { style: 'thin', color: { rgb: '000000' } },
-      right: { style: 'thin', color: { rgb: '000000' } },
-    },
-  };
-
-  // Create a new workbook and add the worksheet
-  const workbook = XLSX.utils.book_new();
-  XLSX.utils.book_append_sheet(workbook, worksheet, "Report");
-
-  // Generate the Excel file as a buffer
-  const excelBuffer = XLSX.write(workbook, { bookType: 'xlsx', type: 'array' });
-
-  if (Platform.OS === 'web') {
-    // Web platform code
-    const blob = new Blob([excelBuffer], { type: 'application/vnd.openxmlformats-officedocument.spreadsheetml.sheet' });
-    const fileUrl = URL.createObjectURL(blob);
-    const link = document.createElement('a');
-    link.href = fileUrl;
-    link.setAttribute('download', 'ShiftReport.xlsx');
-    document.body.appendChild(link);
-    link.click();
-    link.parentNode.removeChild(link);
-  } else {
-    // Mobile platform code
+  const handleDownloadReport = async () => {
+    if (!reportData || reportData.length === 0) {
+      Alert.alert('No Data', 'No report data available to download.');
+      return;
+    }
+  
+    let headers;
+    let data;
+  
+    if (reportType === 'SHIFT SUMMARY REPORT') {
+      headers = ['Shift No', 'Date', 'Activity', 'Total Input (kgs)', 'Total Output (kgs)', 'Input/Output Ratio', 'Production Loss', 'Production Gain'];
+      data = reportData;
+    } else if (reportType === 'SHIFT ACTIVITY REPORT') {
+      headers = ['Shift No', 'Supplier', 'Grade', 'Total Kgs', 'Total Bags', 'Batch No', 'Cell', 'Entry Type'];
+      data = reportData.map(item => ({
+        'Shift No': item.shift.shift_no,
+        'Supplier': item.supplier,
+        'Grade': item.grade,
+        'Total Kgs': item.total_kgs,
+        'Total Bags': item.total_bags,
+        'Batch No': item.batchno_grn,
+        'Cell': item.cell,
+        'Entry Type': item.entry_type
+      }));
+    }
+  
+    const worksheet = XLSX.utils.json_to_sheet([]);
+    XLSX.utils.sheet_add_aoa(worksheet, [headers], { origin: 'A1' });
+    XLSX.utils.sheet_add_json(worksheet, data, { origin: 'A2', skipHeader: true });
+    worksheet['!rows'] = Array(data.length + 1).fill({ hpx: 30 });
+  
+    const workbook = XLSX.utils.book_new();
+    XLSX.utils.book_append_sheet(workbook, worksheet, "Report");
+  
+    const excelBuffer = XLSX.write(workbook, { bookType: 'xlsx', type: 'array' });
+  
     const fileUri = `${FileSystem.documentDirectory}ShiftReport.xlsx`;
-
+  
     await FileSystem.writeAsStringAsync(fileUri, Buffer.from(excelBuffer).toString('base64'), {
       encoding: FileSystem.EncodingType.Base64,
     });
-
+  
     if (await Sharing.isAvailableAsync()) {
       await Sharing.shareAsync(fileUri);
     } else {
       Alert.alert('Download', 'Report has been saved successfully!');
     }
-  }
-};
+  };
 
 
   const renderDropdown = (value, setValue, showDropDown, setShowDropDown, list, label) => {
@@ -300,7 +246,6 @@ const styles = StyleSheet.create({
     height: 40,
     borderColor: '#ccc',
     borderWidth: 1,
-    borderRadius: 5,
     paddingHorizontal: 10,
     backgroundColor: '#fff',
   },
@@ -312,7 +257,6 @@ const styles = StyleSheet.create({
     height: 40,
     borderColor: '#000',
     borderWidth: 1,
-    borderRadius: 4,
     paddingLeft: 8,
     paddingRight: 8,
   },
@@ -368,7 +312,7 @@ export default ReportScreen;
 //     };
 
 //     try {
-//       const response = await fetch("http://127.0.0.1:8000/api/shift-summary-report/", requestOptions);
+//       const response = await fetch("http://192.168.81.57:8000/api/shift-summary-report/", requestOptions);
 //       const result = await response.json();
 //       setReportData(result);
 //       setLoading(false);

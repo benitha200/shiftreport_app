@@ -17,7 +17,7 @@
 //     };
 
 //     try {
-//       const response = await fetch('http://127.0.0.1:8000/api/shifts/', {
+//       const response = await fetch('http://192.168.81.57:8000/api/shifts/', {
 //         method: 'POST',
 //         headers: {
 //           'Content-Type': 'application/json',
@@ -98,6 +98,7 @@ export default function AddShiftScreen({ navigation, route }) {
 
   const { setShifts } = route.params;
   
+  
   const handleAddShift = async () => {
     const newShift = {
       shift_no: parseInt(shiftNo),
@@ -119,7 +120,7 @@ export default function AddShiftScreen({ navigation, route }) {
         return;
       }
   
-      const response = await fetch('http://127.0.0.1:8000/api/shifts/', {
+      const response = await fetch('http://192.168.81.57:8000/api/shifts/', {
         method: 'POST',
         headers: {
           'Content-Type': 'application/json',
