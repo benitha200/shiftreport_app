@@ -42,8 +42,6 @@ export default function HomeScreen({ navigation }) {
         console.error('Error fetching shifts:', error);
         
         if (error.response) {
-          // The request was made and the server responded with a status code
-          // that falls out of the range of 2xx
           console.error('Error data:', error.response.data);
           console.error('Error status:', error.response.status);
           console.error('Error headers:', error.response.headers);
@@ -121,7 +119,7 @@ export default function HomeScreen({ navigation }) {
         />
       </DataTable>
       <FAB
-        style={[styles.fab, { backgroundColor: colors.primary }]}
+        style={[styles.fab, { backgroundColor: colors.primary,colors: colors.secondary}]}
         icon="plus"
         label='Add Shift'
         onPress={() => navigation.navigate('Add Shift', { setShifts })}
@@ -158,7 +156,6 @@ const styles = StyleSheet.create({
   table: {
     backgroundColor: '#ffffff',
     margin: 0,
-    borderRadius: 8,
     overflow: 'hidden',
     elevation: 4,
   },

@@ -15,6 +15,7 @@ import ReportScreen from './screens/ReportScreen';
 import DashboardScreen from './screens/DashboardScreen';
 import LoginScreen from './screens/LoginScreen';
 
+
 const Stack = createStackNavigator();
 const Drawer = createDrawerNavigator();
 
@@ -24,8 +25,39 @@ const theme = {
     ...DefaultTheme.colors,
     primary: '#008080',
     accent: '#00a86b',
+    background: '#ffffff',
+    surface: '#ffffff',
+    text: '#000000',
+    error: '#B00020',
+    disabled: '#9E9E9E',
+    placeholder: '#757575',
+    backdrop: '#00000080',
+  },
+  roundness: 4,
+  fonts: {
+    ...DefaultTheme.fonts,
+    regular: {
+      fontFamily: 'Roboto, "Helvetica Neue", Helvetica, Arial, sans-serif',
+      fontWeight: 'normal',
+    },
+    medium: {
+      fontFamily: 'Roboto, "Helvetica Neue", Helvetica, Arial, sans-serif',
+      fontWeight: '500',
+    },
+    light: {
+      fontFamily: 'Roboto, "Helvetica Neue", Helvetica, Arial, sans-serif',
+      fontWeight: '300',
+    },
+    thin: {
+      fontFamily: 'Roboto, "Helvetica Neue", Helvetica, Arial, sans-serif',
+      fontWeight: '100',
+    },
+  },
+  animation: {
+    scale: 1.0,
   },
 };
+
 
 function MainStack() {
   return (

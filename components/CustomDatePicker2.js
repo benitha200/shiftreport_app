@@ -88,7 +88,6 @@ const CustomDatePicker = ({ value, mode, display, onChange }) => {
       mode,
       display,
       onChange,
-      color:'teal',
     });
   };
 
@@ -97,7 +96,8 @@ const CustomDatePicker = ({ value, mode, display, onChange }) => {
       <Button
         onPress={showPicker}
         title={value.toDateString()}
-        color={styles.button.backgroundColor}
+        color={styles.button.color}
+        mode='outlined'
       />
     </View>
   );
@@ -105,6 +105,7 @@ const CustomDatePicker = ({ value, mode, display, onChange }) => {
 const styles = StyleSheet.create({
   button: {
     backgroundColor: 'teal',
+    color: 'teal',
   },
 });
 

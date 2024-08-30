@@ -18,7 +18,6 @@ import Svg, { Path } from 'react-native-svg';
 import axios from 'axios';
 import API_URL from './../components/const';
 
-const { width, height } = Dimensions.get('window');
 
 const WavyBackground = () => (
   <View style={styles.wavyBackground}>
@@ -50,11 +49,18 @@ export default function LoginScreen({ onLogin }) {
       if (response.data.access) {
         console.log('Logged in successfully');
         console.log(response.data);
-        await AsyncStorage.setItem('token', response.data.access);
-        await AsyncStorage.setItem('email', response.data.email);
-        await AsyncStorage.setItem('name', `${response.data.first_name} ${response.data.last_name}`);
-        await AsyncStorage.setItem('role', response.data.role);
-        await AsyncStorage.setItem('username', response.data.username);
+        // await AsyncStorage.setItem('token', response.data.access);
+        // await AsyncStorage.setItem('email', response.data.email);
+        // await AsyncStorage.setItem('name', `${response.data.first_name} ${response.data.last_name}`);
+        // await AsyncStorage.setItem('role', response.data.role);
+        // await AsyncStorage.setItem('username', response.data.username);
+        await Promise.all([
+          AsyncStorage.setItem('token', response.data.access),
+          AsyncStorage.setItem('email', response.data.email),
+          AsyncStorage.setItem('name', `${response.data.first_name} ${response.data.last_name}`),
+          AsyncStorage.setItem('role', response.data.role),
+          AsyncStorage.setItem('username', response.data.username)
+        ]);
 
         onLogin();
       } else {
@@ -150,7 +156,6 @@ const styles = StyleSheet.create({
   },
   formContainer: {
     backgroundColor: 'rgba(255, 255, 255, 0.8)',
-    borderRadius: 20,
     padding: 20,
     shadowColor: "#000",
     shadowOffset: {
@@ -167,7 +172,7 @@ const styles = StyleSheet.create({
     borderRadius: 5,
     marginBottom: 15,
     paddingLeft: 15,
-    fontSize: 16,
+    fontSize: 18,
     backgroundColor: 'white',
   },
   button: {
