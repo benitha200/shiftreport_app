@@ -49,11 +49,6 @@ export default function LoginScreen({ onLogin }) {
       if (response.data.access) {
         console.log('Logged in successfully');
         console.log(response.data);
-        // await AsyncStorage.setItem('token', response.data.access);
-        // await AsyncStorage.setItem('email', response.data.email);
-        // await AsyncStorage.setItem('name', `${response.data.first_name} ${response.data.last_name}`);
-        // await AsyncStorage.setItem('role', response.data.role);
-        // await AsyncStorage.setItem('username', response.data.username);
         await Promise.all([
           AsyncStorage.setItem('token', response.data.access),
           AsyncStorage.setItem('email', response.data.email),

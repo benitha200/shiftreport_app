@@ -197,113 +197,6 @@ export default function DashboardScreen() {
     fetchSummaryData().then(() => setRefreshing(false));
   }, []);
 
-  // const renderCards = () => {
-  //   const totalShifts = summaryData.length;
-  //   const totalInputKgs = summaryData.reduce((total, item) => total + item.total_input_kgs, 0);
-  //   const totalOutputKgs = summaryData.reduce((total, item) => total + item.total_output_kgs, 0);
-  //   const totalProductionLoss = summaryData.reduce((total, item) => total + item.production_loss, 0);
-  //   const totalProductionGain = summaryData.reduce((total, item) => total + item.production_gain, 0);
-
-  //   return (
-  //     <View style={styles.cardsContainer}>
-  //       <Card style={styles.card}>
-  //         <Card.Content>
-  //           <Icon name="calendar-clock" size={24} color="#4CAF50" style={{ alignSelf: 'center' }} />
-  //           <Title style={{ alignSelf: 'center' }}>Total Shifts</Title>
-  //           <Paragraph style={styles.cardValue}>{totalShifts}</Paragraph>
-  //         </Card.Content>
-  //       </Card>
-  //       <Card style={styles.card}>
-  //         <Card.Content>
-  //           <Icon name="weight-kilogram" size={24} color="#2196F3" style={{ alignSelf: 'center' }} />
-  //           <Title style={{ alignSelf: 'center' }}>Total Input</Title>
-  //           <Paragraph style={styles.cardValue}>{totalInputKgs.toFixed(0)} Kgs</Paragraph>
-  //         </Card.Content>
-  //       </Card>
-  //       <Card style={styles.card}>
-  //         <Card.Content>
-  //           <Icon name="package-variant" size={24} color="#FFC107" style={{ alignSelf: 'center' }} />
-  //           <Title style={{ alignSelf: 'center' }}>Total Output</Title>
-  //           <Paragraph style={styles.cardValue}>{totalOutputKgs.toFixed(0)} Kgs</Paragraph>
-  //         </Card.Content>
-  //       </Card>
-  //       <Card style={styles.card}>
-  //         <Card.Content>
-  //           <Icon name="trending-down" size={24} color="#F44336" style={{ alignSelf: 'center' }} />
-  //           <Title style={{ alignSelf: 'center' }}>Production Loss</Title>
-  //           <Paragraph style={styles.cardValue}>{totalProductionLoss.toFixed(0)} Kgs</Paragraph>
-  //         </Card.Content>
-  //       </Card>
-  //       <Card style={styles.card}>
-  //         <Card.Content>
-  //           <Icon name="trending-up" size={24} color="#4CAF50" style={{ alignSelf: 'center' }} />
-  //           <Title style={{ alignSelf: 'center' }}>Production Gain</Title>
-  //           <Paragraph style={styles.cardValue}>{totalProductionGain.toFixed(0)} Kgs</Paragraph>
-  //         </Card.Content>
-  //       </Card>
-  //     </View>
-  //   );
-  // };
-
-
-  // const renderInputOutputChart = (data = summaryData) => {
-  //   // Handle cases where summaryData might be empty or undefined
-  //   if (!Array.isArray(data) || data.length === 0) {
-  //     return (
-  //       <View style={styles.container}>
-  //         <Text style={styles.noDataText}>No Data Available</Text>
-  //       </View>
-  //     );
-  //   }
-  
-  //   const labels = data.map(item => `Shift ${item.shift_no}`);
-  //   const inputData = data.map(item => item.total_input_kgs || 0);
-  //   const outputData = data.map(item => item.total_output_kgs || 0);
-  
-  //   const chartData = {
-  //     labels: labels,
-  //     datasets: [
-  //       {
-  //         data: inputData,
-  //         color: (opacity = 0.5) => `rgba(0, 0, 255, ${opacity})`, // Blue for input
-  //         strokeWidth: 2,
-  //       },
-  //       {
-  //         data: outputData,
-  //         color: (opacity = 1) => `rgba(255, 165, 0, ${opacity})`, // Orange for output
-  //         strokeWidth: 2,
-  //       },
-  //     ],
-  //     legend: ['Input', 'Output'],
-  //   };
-  
-  //   return (
-  //     <View style={styles.chartContainer}>
-  //       <Text style={styles.title}>Input vs Output per Shift</Text>
-  //       <LineChart
-  //         data={chartData}
-  //         width={screenWidth - 40}
-  //         height={220}
-  //         chartConfig={{
-  //           backgroundColor: '#ffffff',
-  //           backgroundGradientFrom: '#ffffff',
-  //           backgroundGradientTo: '#ffffff',
-  //           decimalPlaces: 0,
-  //           color: (opacity = 1) => `rgba(0, 0, 0, ${opacity})`,
-  //           style: {
-  //             borderRadius: 16,
-  //           },
-  //           propsForDots: {
-  //             r: '6',
-  //             strokeWidth: '2',
-  //           },
-  //         }}
-  //         bezier
-  //         style={styles.chart}
-  //       />
-  //     </View>
-  //   );
-  // };
   
   const renderCards = () => {
     const totalShifts = summaryData.length || 0;
@@ -342,13 +235,7 @@ export default function DashboardScreen() {
             <Paragraph style={styles.cardValue}>{totalProductionLoss.toFixed(0)} Kgs</Paragraph>
           </Card.Content>
         </Card>
-        <Card style={styles.card}>
-          <Card.Content>
-            <Icon name="trending-up" size={24} color="#4CAF50" style={{ alignSelf: 'center' }} />
-            <Title style={{ alignSelf: 'center' }}>Production Gain</Title>
-            <Paragraph style={styles.cardValue}>{totalProductionGain.toFixed(0)} Kgs</Paragraph>
-          </Card.Content>
-        </Card>
+    
       </View>
     );
   };
@@ -362,7 +249,7 @@ export default function DashboardScreen() {
       );
     }
   
-    const labels = data.map(item => `Shift ${item.shift_no}`);
+    const labels = data.map(item => `${item.shift_no}`);
     const inputData = data.map(item => item.total_input_kgs || 0);
     const outputData = data.map(item => item.total_output_kgs || 0);
   

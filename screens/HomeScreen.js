@@ -2,7 +2,6 @@ import React, { useState, useEffect } from 'react';
 import { View, StyleSheet, FlatList, Alert } from 'react-native';
 import { DataTable, FAB, Searchbar,Text,useTheme } from 'react-native-paper';
 import AsyncStorage from '@react-native-async-storage/async-storage';
-import { MaterialCommunityIcons } from '@expo/vector-icons';
 
 import axios from 'axios';
 
@@ -46,10 +45,8 @@ export default function HomeScreen({ navigation }) {
           console.error('Error status:', error.response.status);
           console.error('Error headers:', error.response.headers);
         } else if (error.request) {
-          // The request was made but no response was received
           console.error('Error request:', error.request);
         } else {
-          // Something happened in setting up the request that triggered an Error
           console.error('Error message:', error.message);
         }
   

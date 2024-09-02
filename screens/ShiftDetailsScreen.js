@@ -30,7 +30,7 @@ export default function ShiftDetailsScreen({ route, navigation }) {
         Alert.alert('Error', 'Failed to fetch shift details.');
       }
     };
-  
+
 
     const fetchShiftEntries = async () => {
       try {
@@ -47,11 +47,29 @@ export default function ShiftDetailsScreen({ route, navigation }) {
         setTableData([]);
       }
     };
-  
+
     fetchShiftDetails();
     fetchShiftEntries();
   }, [shiftId]);
-  
+
+   const calculateBags = (kgs) => {
+    const numKgs = parseFloat(kgs);
+    if (isNaN(numKgs) || numKgs <= 0) return '0';
+    if (numKgs <= 60) return '1';
+    return Math.ceil(numKgs / 60).toString();
+  };
+
+
+  useEffect(() => {
+    if (totalkgs) {
+      const calculatedBags = calculateBags(totalkgs);
+      setTotalbags(calculatedBags);
+    }
+  }, [totalkgs]);
+
+  const handleTotalKgsChange = (value) => {
+    setTotalkgs(value);
+  };
 
   const renderDropdown = (value, setValue, showDropDown, setShowDropDown, list, label) => {
     if (Platform.OS === 'web') {
@@ -108,8 +126,7 @@ export default function ShiftDetailsScreen({ route, navigation }) {
     if (!validateInputs()) return;
 
     const newEntry = {
-      shift_id: shiftId, // Ensure shift_id is used
-      // supplier,
+      shift_id: shiftId, 
       grade,
       total_kgs: totalkgs,
       total_bags: totalbags,
@@ -150,12 +167,12 @@ export default function ShiftDetailsScreen({ route, navigation }) {
     const filteredData = Array.isArray(tableData)
       ? tableData.filter(item => item.entry_type === type)
       : [];
-  
+
     const totals = filteredData.reduce((acc, item) => ({
       total_kgs: acc.total_kgs + parseFloat(item.total_kgs || 0),
       total_bags: acc.total_bags + parseInt(item.total_bags || 0)
     }), { total_kgs: 0, total_bags: 0 });
-  
+
     return (
       <Card style={styles.card}>
         <Card.Content>
@@ -168,7 +185,7 @@ export default function ShiftDetailsScreen({ route, navigation }) {
                 </DataTable.Title>
               ))}
             </DataTable.Header>
-            
+
             {filteredData.map((item) => (
               <DataTable.Row key={item.id}>
                 {['grade', 'total_kgs', 'total_bags', 'batchno_grn', 'cell'].map((field, index) => (
@@ -178,7 +195,7 @@ export default function ShiftDetailsScreen({ route, navigation }) {
                 ))}
               </DataTable.Row>
             ))}
-  
+
             <DataTable.Row style={styles.totalRow}>
               <DataTable.Cell style={styles.cell}>
                 <Text style={styles.totalText}>Total</Text>
@@ -197,7 +214,7 @@ export default function ShiftDetailsScreen({ route, navigation }) {
       </Card>
     );
   }
-  
+
   return (
     <ScrollView style={styles.container}>
       {shiftDetails && (
@@ -220,20 +237,25 @@ export default function ShiftDetailsScreen({ route, navigation }) {
         <Card.Content>
           <Title>Add Entry</Title>
           {renderDropdown(grade, setGrade, showGradeDropDown, setShowGradeDropDown, gradeList, 'Grade')}
+
           <TextInput
-            label="Total Kgs"
+            label="Total Kgs*"
             value={totalkgs}
-            onChangeText={setTotalkgs}
+            onChangeText={handleTotalKgsChange}
             keyboardType="numeric"
             style={styles.input}
+            mode="outlined"
           />
           <TextInput
-            label="Total Bags"
+            label="Total Bags*"
             value={totalbags}
             onChangeText={setTotalbags}
             keyboardType="numeric"
             style={styles.input}
+            mode="outlined"
+            readOnly="true"
           />
+
           <TextInput
             label="GRN/Batch No"
             value={batchnogrn}
@@ -304,10 +326,10 @@ const styles = StyleSheet.create({
     marginTop: 10,
   },
   button: {
-    flexBasis:'45%',
-    margin:5,
+    flexBasis: '45%',
+    margin: 5,
     marginHorizontal: 5,
-    textAlign:'left',
+    textAlign: 'left',
   },
   inputButton: {
     backgroundColor: 'rgb(148 163 184)',
@@ -330,17 +352,17 @@ const styles = StyleSheet.create({
     textAlign: 'left',
     backgroundColor: 'rgb(226 232 240)',
   },
-  totalText:{
+  totalText: {
     fontWeight: 'bold',
     color: 'rgb(255 255 255)',
-    padding:'0.02rem',
+    padding: '0.02rem',
     textAlign: 'right',
     padding: 5,
   },
-  totalRow:{
-    backgroundColor:'rgb(20 184 166)',
+  totalRow: {
+    backgroundColor: 'rgb(20 184 166)',
   },
-  textStyle:{
+  textStyle: {
     fontWeight: 'bold',
     color: 'rgb(15 118 110)',
     padding: 5,

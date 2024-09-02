@@ -74,7 +74,7 @@ function MainStack() {
     >
       <Stack.Screen name="Shift Reports" component={HomeScreen} />
       <Stack.Screen name="Add Shift" component={AddShiftScreen} />
-      <Stack.Screen name="Shift Details" component={ShiftDetailsScreen} />
+      <Stack.Screen name="ShiftDetailsScreen" component={ShiftDetailsScreen} />
       <Stack.Screen name="Dashboard" component={DashboardScreen} />
     </Stack.Navigator>
   );
