@@ -19,7 +19,7 @@ export default function ShiftDetailsScreen({ route, navigation }) {
   useEffect(() => {
     const fetchShiftDetails = async () => {
       try {
-        const response = await fetch(`http://192.168.81.57:8000/api/shifts/${shiftId}`, {
+        const response = await fetch(`http://192.168.81.129:8000/api/shifts/${shiftId}`, {
           method: 'GET',
           headers: { 'Content-Type': 'application/json' },
         });
@@ -34,7 +34,7 @@ export default function ShiftDetailsScreen({ route, navigation }) {
 
     const fetchShiftEntries = async () => {
       try {
-        const response = await fetch(`http://192.168.81.57:8000/api/shiftdetail/${shiftId}/`);
+        const response = await fetch(`http://192.168.81.129:8000/api/shiftdetail/${shiftId}/`);
         if (response.ok) {
           const data = await response.json();
           setTableData(Array.isArray(data) ? data : []);
@@ -135,7 +135,7 @@ export default function ShiftDetailsScreen({ route, navigation }) {
       entry_type: type,
     };
 
-    fetch('http://192.168.81.57:8000/api/shiftdetails/', {
+    fetch('http://192.168.81.129:8000/api/shiftdetails/', {
       method: 'POST',
       headers: {
         'Content-Type': 'application/json',

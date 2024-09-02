@@ -81,7 +81,7 @@ export default function DashboardScreen() {
 
   //     // Change the IP address to 10.0.2.2 when using an emulator
   //     const response = await axios.post(
-  //       "http://10.0.2.2:8000/api/shift-summary-report/",
+  //       "http://192.168.81.129:8000/api/shift-summary-report/",
   //       requestData,
   //       {
   //         headers: {
@@ -135,7 +135,7 @@ export default function DashboardScreen() {
   
       // Change the IP address to 10.0.2.2 when using an emulator
       const response = await axios.post(
-        "http://10.0.2.2:8000/api/shift-summary-report/",
+        "http://192.168.81.129:8000/api/shift-summary-report/",
         requestData,
         {
           headers: {
