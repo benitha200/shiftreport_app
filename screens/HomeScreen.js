@@ -1,6 +1,6 @@
 import React, { useState, useEffect } from 'react';
 import { View, StyleSheet, FlatList, Alert } from 'react-native';
-import { DataTable, FAB, Searchbar,Text,useTheme } from 'react-native-paper';
+import { DataTable, FAB, Searchbar, Text, useTheme } from 'react-native-paper';
 import AsyncStorage from '@react-native-async-storage/async-storage';
 
 import axios from 'axios';
@@ -11,35 +11,35 @@ export default function HomeScreen({ navigation }) {
   const [searchQuery, setSearchQuery] = useState('');
 
 
-  
+
   useEffect(() => {
     const fetchShifts = async () => {
       try {
         console.log('Fetching shifts...');
-        
+
         const token = await AsyncStorage.getItem('token');
-        
+
         if (!token) {
           console.error('No token found');
           Alert.alert('Error', 'You are not logged in. Please log in and try again.');
           return;
         }
-        
+
         console.log('Token retrieved successfully');
-  
+
         const response = await axios.get("http://192.168.81.129:8000/api/shifts/", {
           headers: {
             Authorization: `Bearer ${token}`
           }
         });
-  
+
         console.log('Response status:', response.status);
         console.log('Response data:', response.data);
-  
+
         setShifts(response.data);
       } catch (error) {
         console.error('Error fetching shifts:', error);
-        
+
         if (error.response) {
           console.error('Error data:', error.response.data);
           console.error('Error status:', error.response.status);
@@ -49,11 +49,11 @@ export default function HomeScreen({ navigation }) {
         } else {
           console.error('Error message:', error.message);
         }
-  
+
         Alert.alert('Error', 'Failed to fetch shifts. Please check your connection and try again.');
       }
     };
-  
+
     fetchShifts();
   }, []);
 
@@ -67,14 +67,16 @@ export default function HomeScreen({ navigation }) {
     const shiftType = shift.shift_type || '';
     const supplier = shift.supplier || '';
     const coffeeType = shift.coffee_type || '';
-    
+    const status = shift.status || '';
+
     return (
       shiftNo.toString().toLowerCase().includes(searchQuery.toLowerCase()) ||
       activity.toLowerCase().includes(searchQuery.toLowerCase()) ||
       date.includes(searchQuery) ||
       shiftType.toLowerCase().includes(searchQuery.toLowerCase()) ||
       supplier.toLowerCase().includes(searchQuery.toLowerCase()) ||
-      coffeeType.toLowerCase().includes(searchQuery.toLowerCase())
+      coffeeType.toLowerCase().includes(searchQuery.toLowerCase()) ||
+      status.toLowerCase().includes(searchQuery.toLowerCase())
     );
   });
 
@@ -86,12 +88,15 @@ export default function HomeScreen({ navigation }) {
       <DataTable.Cell style={styles.cell}>{item.shift_type}</DataTable.Cell>
       <DataTable.Cell style={styles.cell}>{item.supplier}</DataTable.Cell>
       <DataTable.Cell style={styles.cell}>{item.coffee_type}</DataTable.Cell>
+      <DataTable.Cell style={[styles.cell, item.status ? styles.completedStatus : styles.pendingStatus]}>
+        {item.status ? 'Completed' : 'Pending'}
+      </DataTable.Cell>
     </DataTable.Row>
   );
 
   return (
     <View style={styles.container}>
-  
+
       <Searchbar
         placeholder="Search shifts"
         onChangeText={onChangeSearch}
@@ -108,6 +113,7 @@ export default function HomeScreen({ navigation }) {
           <DataTable.Title style={styles.headerCell}>Type</DataTable.Title>
           <DataTable.Title style={styles.headerCell}>Supplier</DataTable.Title>
           <DataTable.Title style={styles.headerCell}>Coffee</DataTable.Title>
+          <DataTable.Title style={styles.headerCell}>Status</DataTable.Title>
         </DataTable.Header>
         <FlatList
           data={filteredShifts}
@@ -116,7 +122,7 @@ export default function HomeScreen({ navigation }) {
         />
       </DataTable>
       <FAB
-        style={[styles.fab, { backgroundColor: colors.primary,colors: colors.secondary}]}
+        style={[styles.fab, { backgroundColor: colors.primary, colors: colors.secondary }]}
         icon="plus"
         label='Add Shift'
         onPress={() => navigation.navigate('Add Shift', { setShifts })}
@@ -145,7 +151,7 @@ const styles = StyleSheet.create({
   searchbar: {
     margin: 16,
     elevation: 4,
-    backgroundColor:'rgb(226 232 240)',
+    backgroundColor: 'rgb(226 232 240)',
   },
   searchInput: {
     fontSize: 16,
@@ -174,5 +180,12 @@ const styles = StyleSheet.create({
     margin: 16,
     right: 0,
     bottom: 0,
+  },
+  pendingStatus: {
+    backgroundColor: '#e1c0c0', // Color for Pending status
+  },
+  completedStatus: {
+    backgroundColor: '#94e1b0',
+    color:'#CC9966', 
   },
 });

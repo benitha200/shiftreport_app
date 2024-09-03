@@ -13,6 +13,8 @@ export default function ShiftDetailsScreen({ route, navigation }) {
   const [batchnogrn, setBatchnogrn] = useState('');
   const [cell, setCell] = useState('');
   const [tableData, setTableData] = useState([]);
+  const [isFormVisible, setIsFormVisible] = useState(true);
+  const [isCompleted, setIsCompleted] = useState(false);
 
   const gradeList = ['F.SC.15', 'F.SC.13', 'F.CSR.15', 'F.GTR.15', 'FW.TRI', 'SC.15', 'SC.13'];
 
@@ -25,6 +27,7 @@ export default function ShiftDetailsScreen({ route, navigation }) {
         });
         const result = await response.json();
         setShiftDetails(result);
+        setIsCompleted(result.status);
       } catch (error) {
         console.error('Error fetching shift details:', error);
         Alert.alert('Error', 'Failed to fetch shift details.');
@@ -77,7 +80,30 @@ export default function ShiftDetailsScreen({ route, navigation }) {
     return inputEntries > 0 && outputEntries > 0;
   };
   const handleCloseShiftReport = () => {
-    Alert.alert('Shift Report Closed', 'The shift report has been successfully closed.');
+    // Alert.alert('Shift Report Closed', 'The shift report has been successfully closed.');
+    const myHeaders = new Headers();
+    myHeaders.append("Content-Type", "application/json");
+    myHeaders.append("Cookie", "csrftoken=m4Li2tWC0w0QKzBHV7e8tal2rnYqh6nj");
+
+    const raw = JSON.stringify({
+      "status": "True"
+    });
+
+    const requestOptions = {
+      method: "PATCH",
+      headers: myHeaders,
+      body: raw,
+    };
+
+    fetch(`http://192.168.81.129:8000/api/shifts/${shiftId}`, requestOptions)
+      .then((response) => response.json())
+      .then((result) => {
+        console.log(result)
+        // setIsFormVisible(false);
+        setIsCompleted(true);
+        Alert.alert('Shift report completed!');
+      })
+      .catch((error) => console.error(error));
   };
 
   const renderDropdown = (value, setValue, showDropDown, setShowDropDown, list, label) => {
@@ -238,7 +264,7 @@ export default function ShiftDetailsScreen({ route, navigation }) {
               <Paragraph>Supplier: <Paragraph style={styles.textStyle}>{shiftDetails.supplier || 'N/A'}</Paragraph></Paragraph>
               <Paragraph>Coffee Type: {shiftDetails.coffee_type || 'N/A'}</Paragraph>
             </View>
-            {canCloseShiftReport() && (
+            {canCloseShiftReport() && !isCompleted &&(
               <View style={styles.closeShiftContainer}>
                 <Button mode="contained" onPress={handleCloseShiftReport} style={styles.closeShiftButton}>
                   Complete Shift Report
@@ -249,6 +275,7 @@ export default function ShiftDetailsScreen({ route, navigation }) {
         </Card>
       )}
 
+{!isCompleted && (
       <Card style={styles.card}>
         <Card.Content>
           <Title>Add Entry</Title>
@@ -296,7 +323,7 @@ export default function ShiftDetailsScreen({ route, navigation }) {
             </Button>
           </View>
         </Card.Content>
-      </Card>
+      </Card>)}
 
       {renderTable('Input')}
       {renderTable('Output')}
