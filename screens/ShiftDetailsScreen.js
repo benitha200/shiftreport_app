@@ -52,7 +52,7 @@ export default function ShiftDetailsScreen({ route, navigation }) {
     fetchShiftEntries();
   }, [shiftId]);
 
-   const calculateBags = (kgs) => {
+  const calculateBags = (kgs) => {
     const numKgs = parseFloat(kgs);
     if (isNaN(numKgs) || numKgs <= 0) return '0';
     if (numKgs <= 60) return '1';
@@ -69,6 +69,15 @@ export default function ShiftDetailsScreen({ route, navigation }) {
 
   const handleTotalKgsChange = (value) => {
     setTotalkgs(value);
+  };
+
+  const canCloseShiftReport = () => {
+    const inputEntries = tableData.filter(item => item.entry_type === 'Input').length;
+    const outputEntries = tableData.filter(item => item.entry_type === 'Output').length;
+    return inputEntries > 0 && outputEntries > 0;
+  };
+  const handleCloseShiftReport = () => {
+    Alert.alert('Shift Report Closed', 'The shift report has been successfully closed.');
   };
 
   const renderDropdown = (value, setValue, showDropDown, setShowDropDown, list, label) => {
@@ -126,7 +135,7 @@ export default function ShiftDetailsScreen({ route, navigation }) {
     if (!validateInputs()) return;
 
     const newEntry = {
-      shift_id: shiftId, 
+      shift_id: shiftId,
       grade,
       total_kgs: totalkgs,
       total_bags: totalbags,
@@ -229,6 +238,13 @@ export default function ShiftDetailsScreen({ route, navigation }) {
               <Paragraph>Supplier: <Paragraph style={styles.textStyle}>{shiftDetails.supplier || 'N/A'}</Paragraph></Paragraph>
               <Paragraph>Coffee Type: {shiftDetails.coffee_type || 'N/A'}</Paragraph>
             </View>
+            {canCloseShiftReport() && (
+              <View style={styles.closeShiftContainer}>
+                <Button mode="contained" onPress={handleCloseShiftReport} style={styles.closeShiftButton}>
+                  Complete Shift Report
+                </Button>
+              </View>
+            )}
           </Card.Content>
         </Card>
       )}
@@ -366,5 +382,13 @@ const styles = StyleSheet.create({
     fontWeight: 'bold',
     color: 'rgb(15 118 110)',
     padding: 5,
+  },
+  closeShiftContainer: {
+    marginTop: 20,
+    alignItems: 'center',
+  },
+  closeShiftButton: {
+    backgroundColor: 'rgb(21 128 61)', // Red color for attention
+    padding: 2,
   },
 });

@@ -79,7 +79,7 @@ export default function HomeScreen({ navigation }) {
   });
 
   const renderItem = ({ item }) => (
-    <DataTable.Row onPress={() => navigation.navigate('Shift Details', { shiftId: item.id })} style={styles.row}>
+    <DataTable.Row onPress={() => navigation.navigate('ShiftDetailsScreen', { shiftId: item.id })} style={styles.row}>
       <DataTable.Cell style={styles.cell}>{item.shift_no}</DataTable.Cell>
       <DataTable.Cell style={styles.cell}>{item.activity}</DataTable.Cell>
       <DataTable.Cell style={styles.cell}>{item.date}</DataTable.Cell>
