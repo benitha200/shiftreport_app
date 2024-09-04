@@ -41,7 +41,7 @@ const ReportScreen = () => {
   //     };
 
   //     try {
-  //       const response = await fetch("http://192.168.81.129:8000/api/shift-summary-report/", requestOptions);
+  //       const response = await fetch("http://38.242.200.169/api/shift-summary-report/", requestOptions);
   //       const result = await response.json();
   //       setReportData(result);
   //     } catch (error) {
@@ -54,7 +54,7 @@ const ReportScreen = () => {
   //     };
 
   //     try {
-  //       const response = await fetch(`http://192.168.81.129:8000/api/shiftdetail/${startDate.toISOString().split('T')[0]}`, requestOptions);
+  //       const response = await fetch(`http://38.242.200.169/api/shiftdetail/${startDate.toISOString().split('T')[0]}`, requestOptions);
   //       const result = await response.json();
   //       setReportData(result);
   //     } catch (error) {
@@ -88,7 +88,7 @@ const ReportScreen = () => {
       };
   
       try {
-        const response = await fetch("http://192.168.81.129:8000/api/shift-summary-report/", requestOptions);
+        const response = await fetch("http://38.242.200.169/api/shift-summary-report/", requestOptions);
         const result = await response.json();
         setReportData(result);
       } catch (error) {
@@ -103,7 +103,7 @@ const ReportScreen = () => {
       };
   
       try {
-        const response = await fetch("http://192.168.81.129:8000/api/shift-details-report/", requestOptions);
+        const response = await fetch("http://38.242.200.169/api/shift-details-report/", requestOptions);
         const result = await response.json();
         setReportData(result);
       } catch (error) {

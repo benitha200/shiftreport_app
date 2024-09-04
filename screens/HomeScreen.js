@@ -27,7 +27,7 @@ export default function HomeScreen({ navigation }) {
 
         console.log('Token retrieved successfully');
 
-        const response = await axios.get("http://192.168.81.129:8000/api/shifts/", {
+        const response = await axios.get("http://38.242.200.169/api/shifts/", {
           headers: {
             Authorization: `Bearer ${token}`
           }

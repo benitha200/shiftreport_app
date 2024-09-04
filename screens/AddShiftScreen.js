@@ -67,7 +67,7 @@ export default function AddShiftScreen({ navigation, route }) {
         return;
       }
 
-      const response = await fetch('http://192.168.81.129:8000/api/shifts/', {
+      const response = await fetch('http://38.242.200.169/api/shifts/', {
         method: 'POST',
         headers: {
           'Content-Type': 'application/json',
