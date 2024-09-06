@@ -113,27 +113,23 @@ const ReportScreen = () => {
   
     setLoading(false);
   };
-  
 
+  
   const handleDownloadReport = async () => {
     if (!reportData || reportData.length === 0) {
       Alert.alert('No Data', 'No report data available to download.');
       return;
     }
-
+  
     let headers;
     let data;
-
     if (reportType === 'SHIFT SUMMARY REPORT') {
-      headers = ['Shift No', 'Date', 'Activity', 'Total Input (kgs)', 'Total Output (kgs)', 'Production Loss', 'Production Gain'];
+      headers = ['Shift No', 'Date', 'Activity', 'Total Input (kgs)', 'Total Output (kgs)', 'Production Loss'];
       data = reportData;
-    }else if(reportType==='SHIFT DETAILS REPORT'){
-
-      headers = ['Shift No', 'Supplier', 'Date', 'Activity', 'Status', 'Grade', 'Total Bags','Total Kgs','GRN/Batch No',"Cell"];
+    } else if (reportType === 'SHIFT DETAILS REPORT') {
+      headers = ['Shift No', 'Supplier', 'Date', 'Activity', 'Status', 'Grade', 'Total Bags', 'Total Kgs', 'GRN/Batch No', "Cell"];
       data = reportData;
-    }
-    
-    else if (reportType === 'SHIFT ACTIVITY REPORT') {
+    } else if (reportType === 'SHIFT ACTIVITY REPORT') {
       headers = ['Shift No', 'Supplier', 'Grade', 'Total Kgs', 'Total Bags', 'Batch No', 'Cell', 'Entry Type'];
       data = reportData.map(item => ({
         'Shift No': item.shift.shift_no,
@@ -146,29 +142,84 @@ const ReportScreen = () => {
         'Entry Type': item.entry_type
       }));
     }
-
+  
     const worksheet = XLSX.utils.json_to_sheet([]);
     XLSX.utils.sheet_add_aoa(worksheet, [headers], { origin: 'A1' });
     XLSX.utils.sheet_add_json(worksheet, data, { origin: 'A2', skipHeader: true });
     worksheet['!rows'] = Array(data.length + 1).fill({ hpx: 30 });
-
+  
     const workbook = XLSX.utils.book_new();
     XLSX.utils.book_append_sheet(workbook, worksheet, "Report");
-
+  
     const excelBuffer = XLSX.write(workbook, { bookType: 'xlsx', type: 'array' });
-
-    const fileUri = `${FileSystem.documentDirectory}ShiftReport.xlsx`;
-
-    await FileSystem.writeAsStringAsync(fileUri, Buffer.from(excelBuffer).toString('base64'), {
-      encoding: FileSystem.EncodingType.Base64,
-    });
-
-    if (await Sharing.isAvailableAsync()) {
-      await Sharing.shareAsync(fileUri);
-    } else {
-      Alert.alert('Download', 'Report has been saved successfully!');
+    const fileName = `ShiftReport_${new Date().toISOString().slice(0, 10)}.xlsx`;
+    const fileUri = `${FileSystem.documentDirectory}${fileName}`;
+  
+    try {
+      await FileSystem.writeAsStringAsync(fileUri, Buffer.from(excelBuffer).toString('base64'), {
+        encoding: FileSystem.EncodingType.Base64,
+      });
+      Alert.alert('Download Complete', `Report has been saved successfully!\nFile: ${fileName}\nLocation: ${FileSystem.documentDirectory}`);
+    } catch (error) {
+      console.error('Error saving file:', error);
+      Alert.alert('Error', 'Failed to save the report. Please try again.');
     }
   };
+
+  // const handleDownloadReport = async () => {
+  //   if (!reportData || reportData.length === 0) {
+  //     Alert.alert('No Data', 'No report data available to download.');
+  //     return;
+  //   }
+
+  //   let headers;
+  //   let data;
+
+  //   if (reportType === 'SHIFT SUMMARY REPORT') {
+  //     headers = ['Shift No', 'Date', 'Activity', 'Total Input (kgs)', 'Total Output (kgs)', 'Production Loss'];
+  //     data = reportData;
+  //   }else if(reportType==='SHIFT DETAILS REPORT'){
+
+  //     headers = ['Shift No', 'Supplier', 'Date', 'Activity', 'Status', 'Grade', 'Total Bags','Total Kgs','GRN/Batch No',"Cell"];
+  //     data = reportData;
+  //   }
+    
+  //   else if (reportType === 'SHIFT ACTIVITY REPORT') {
+  //     headers = ['Shift No', 'Supplier', 'Grade', 'Total Kgs', 'Total Bags', 'Batch No', 'Cell', 'Entry Type'];
+  //     data = reportData.map(item => ({
+  //       'Shift No': item.shift.shift_no,
+  //       'Supplier': item.supplier,
+  //       'Grade': item.grade,
+  //       'Total Kgs': item.total_kgs,
+  //       'Total Bags': item.total_bags,
+  //       'Batch No': item.batchno_grn,
+  //       'Cell': item.cell,
+  //       'Entry Type': item.entry_type
+  //     }));
+  //   }
+
+  //   const worksheet = XLSX.utils.json_to_sheet([]);
+  //   XLSX.utils.sheet_add_aoa(worksheet, [headers], { origin: 'A1' });
+  //   XLSX.utils.sheet_add_json(worksheet, data, { origin: 'A2', skipHeader: true });
+  //   worksheet['!rows'] = Array(data.length + 1).fill({ hpx: 30 });
+
+  //   const workbook = XLSX.utils.book_new();
+  //   XLSX.utils.book_append_sheet(workbook, worksheet, "Report");
+
+  //   const excelBuffer = XLSX.write(workbook, { bookType: 'xlsx', type: 'array' });
+
+  //   const fileUri = `${FileSystem.documentDirectory}ShiftReport.xlsx`;
+
+  //   await FileSystem.writeAsStringAsync(fileUri, Buffer.from(excelBuffer).toString('base64'), {
+  //     encoding: FileSystem.EncodingType.Base64,
+  //   });
+
+  //   if (await Sharing.isAvailableAsync()) {
+  //     await Sharing.shareAsync(fileUri);
+  //   } else {
+  //     Alert.alert('Download', 'Report has been saved successfully!');
+  //   }
+  // };
 
   const renderDropdown = (value, setValue, showDropDown, setShowDropDown, list, label) => {
     if (Platform.OS === 'web') {

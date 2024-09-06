@@ -3,6 +3,7 @@ import { View, StyleSheet, Alert } from 'react-native';
 import { TextInput, Button, Menu, Title } from 'react-native-paper';
 import AsyncStorage from '@react-native-async-storage/async-storage';
 import { Platform } from 'react-native';
+import { API_URL } from '../components/const';
 
 export default function AddShiftScreen({ navigation, route }) {
   const [shiftNo, setShiftNo] = useState('');
@@ -67,7 +68,7 @@ export default function AddShiftScreen({ navigation, route }) {
         return;
       }
 
-      const response = await fetch('http://38.242.200.169/api/shifts/', {
+      const response = await fetch(`${API_URL}/api/shifts/`, {
         method: 'POST',
         headers: {
           'Content-Type': 'application/json',

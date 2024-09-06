@@ -1,6 +1,7 @@
 import React, { useState, useEffect } from 'react';
 import { View, StyleSheet, ScrollView, Alert, Platform, Text } from 'react-native';
 import { Card, Title, Paragraph, DataTable, TextInput, Button, Menu } from 'react-native-paper';
+import { API_URL } from '../components/const';
 
 export default function ShiftDetailsScreen({ route, navigation }) {
   const { shiftId } = route.params;
@@ -95,7 +96,7 @@ export default function ShiftDetailsScreen({ route, navigation }) {
       body: raw,
     };
 
-    fetch(`http://38.242.200.169/api/shifts/${shiftId}`, requestOptions)
+    fetch(`${API_URL}/api/shifts/${shiftId}`, requestOptions)
       .then((response) => response.json())
       .then((result) => {
         console.log(result)

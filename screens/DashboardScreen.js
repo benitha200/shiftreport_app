@@ -7,6 +7,7 @@ import Icon from 'react-native-vector-icons/MaterialCommunityIcons';
 import DateTimePicker from '@react-native-community/datetimepicker';
 import CustomDatePicker from '../components/CustomDatePicker';
 import axios from 'axios';
+import { API_URL } from '../components/const';
 
 const screenWidth = Dimensions.get('window').width;
 
@@ -135,7 +136,7 @@ export default function DashboardScreen() {
   
       // Change the IP address to 10.0.2.2 when using an emulator
       const response = await axios.post(
-        "http://38.242.200.169/api/shift-summary-report/",
+        `${API_URL}/api/shift-summary-report/`,
         requestData,
         {
           headers: {

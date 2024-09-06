@@ -35,9 +35,11 @@ export default function LoginScreen({ onLogin }) {
   const [email, setEmail] = useState('');
   const [password, setPassword] = useState('');
 
+
   const handleLogin = async () => {
     try {
-      const response = await axios.post(`http://38.242.200.169/api/login/`, {
+      console.log('Attempting to connect to:', API_URL);
+      const response = await axios.post(`${API_URL}/api/login/`, {
         email,
         password
       }, {
@@ -45,7 +47,7 @@ export default function LoginScreen({ onLogin }) {
           'Content-Type': 'application/json'
         }
       });
-
+  
       if (response.data.access) {
         console.log('Logged in successfully');
         console.log(response.data);
@@ -56,7 +58,7 @@ export default function LoginScreen({ onLogin }) {
           AsyncStorage.setItem('role', response.data.role),
           AsyncStorage.setItem('username', response.data.username)
         ]);
-
+  
         onLogin();
       } else {
         Alert.alert('Login failed', 'Invalid email or password');
@@ -66,10 +68,50 @@ export default function LoginScreen({ onLogin }) {
       if (error.response) {
         console.error('Error data:', error.response.data);
         console.error('Error status:', error.response.status);
+      } else if (error.request) {
+        console.error('No response received:', error.request);
+      } else {
+        console.error('Error message:', error.message);
       }
       Alert.alert('Error', `An error occurred while logging in: ${error.message}`);
     }
   };
+
+  // const handleLogin = async () => {
+  //   try {
+  //     const response = await axios.post(`${API_URL}/api/login/`, {
+  //       email,
+  //       password
+  //     }, {
+  //       headers: {
+  //         'Content-Type': 'application/json'
+  //       }
+  //     });
+
+  //     if (response.data.access) {
+  //       console.log('Logged in successfully');
+  //       console.log(response.data);
+  //       await Promise.all([
+  //         AsyncStorage.setItem('token', response.data.access),
+  //         AsyncStorage.setItem('email', response.data.email),
+  //         AsyncStorage.setItem('name', `${response.data.first_name} ${response.data.last_name}`),
+  //         AsyncStorage.setItem('role', response.data.role),
+  //         AsyncStorage.setItem('username', response.data.username)
+  //       ]);
+
+  //       onLogin();
+  //     } else {
+  //       Alert.alert('Login failed', 'Invalid email or password');
+  //     }
+  //   } catch (error) {
+  //     console.error('Error:', error);
+  //     if (error.response) {
+  //       console.error('Error data:', error.response.data);
+  //       console.error('Error status:', error.response.status);
+  //     }
+  //     Alert.alert('Error', `An error occurred while logging in: ${error.message}`);
+  //   }
+  // };
 
   return (
     <ScrollView contentContainerStyle={styles.scrollViewContainer}>
